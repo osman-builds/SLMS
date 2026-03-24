@@ -1,7 +1,5 @@
 package com.mycompany.course;
 
-
-
 import java.util.Scanner;
 
 public class StudentManager {
@@ -25,7 +23,6 @@ public class StudentManager {
     }
 
     // keeps the program running until user chooses to exit
-    // shows the menu and calls the right function based on user choice
     public void run() {
         boolean running = true;
         while (running) {
@@ -35,14 +32,13 @@ public class StudentManager {
             switch (choice) {
                 case 1: submitStudentProfile(); break;
                 case 2: displayAllStudents(); break;
-                case 3: System.out.println("Search  - Coming in Lab 5 Activity 3."); break;
-                case 4: System.out.println("Edit    - Coming in Lab 5 Activity 4."); break;
+                case 3: searchStudentModule(); break; // Integrated Task 3
+                case 4: editStudentModule(); break;   // Integrated Task 4
                 case 5: deleteStudent(); break;
                 case 6: running = false; break;
                 default: System.out.println("Invalid choice: Please select from 1 to 6");
             }
         }
-
     }
 
     // prints the menu options on the screen
@@ -57,34 +53,63 @@ public class StudentManager {
     }
 
     // ======== Task 2: Create Function ====
-
-    // this method asks the user to enter student details and saves it into the array
-    // if the array is already full, it will stop and show a message
     private void submitStudentProfile() {
-
-        // check if array is full before adding, to prevent out of bound error
         if (studentCount >= MAX_STUDENTS) {
             System.out.println("Storage is full.");
             return;
         }
 
         System.out.println("\n--- Submit Student Profile ---");
-
-        // get each detail from user, empty input is not allowed
         String firstName   = readNonEmptyString("First name: ");
         String lastName    = readNonEmptyString("Last name: ");
         String studentId   = readNonEmptyString("Student ID: ");
         String email       = readNonEmptyString("Email: ");
         String phoneNumber = readNonEmptyString("Phone number: ");
 
-        // create new student object and store it in the array
         students[studentCount++] = new Student(firstName, lastName, studentId, email, phoneNumber);
-
         System.out.println("Student profile submitted successfully.");
     }
 
-    // ======== Task 5 & 6: Delete & Display Functions ====
+    // ======== Task 3: Search Function ====
+    private void searchStudentModule() {
+        String searchId = readNonEmptyString("Enter Student ID to search: ");
+        int foundIndex = findStudentIndex(searchId);
 
+        if (foundIndex != -1) {
+            System.out.println("\n--- Student Found ---");
+            displayStudent(students[foundIndex]);
+        } else {
+            // Requirement 3d: Provide clear feedback if the search fails
+            System.out.println("Result: Student not found.");
+        }
+    }
+
+    // ======== Task 4: Edit Function ====
+    private void editStudentModule() {
+        String editId = readNonEmptyString("Enter Student ID to edit: ");
+        
+        //find the index first to ensure the student exists before asking for new data
+        int foundIndex = findStudentIndex(editId);
+
+        if (foundIndex != -1) {
+            Student target = students[foundIndex];
+            System.out.println("\n--- Current Profile ---");
+            displayStudent(target);
+
+            System.out.println("\n[Editing Mode - Student ID cannot be changed]");
+            target.setFirstName(readNonEmptyString("New First Name: "));
+            target.setLastName(readNonEmptyString("New Last Name: "));
+            target.setEmail(readNonEmptyString("New Email: "));
+            target.setPhoneNumber(readNonEmptyString("New Phone Number: "));
+
+            System.out.println("\nUpdate Successful! Validating changes:");
+            displayStudent(target);
+        } else {
+            System.out.println("Error: Student not found. Edit aborted.");
+        }
+    }
+
+    // ======== Task 5 & 6: Delete & Display Functions ====
     private void displayAllStudents() {
         if (studentCount == 0) {
             System.out.println("\nNo students to display.");
@@ -104,14 +129,7 @@ public class StudentManager {
         }
 
         String targetId = readNonEmptyString("Enter Student ID to delete: ");
-        int foundIndex = -1;
-
-        for (int i = 0; i < studentCount; i++) {
-            if (students[i].getStudentId().equalsIgnoreCase(targetId)) {
-                foundIndex = i;
-                break;
-            }
-        }
+        int foundIndex = findStudentIndex(targetId);
 
         if (foundIndex == -1) {
             System.out.println("Student not found.");
@@ -130,9 +148,20 @@ public class StudentManager {
                 System.out.println("Deletion cancelled.");
             }
         }
+    }
 
-        System.out.println("\n--- All Students ---");
-        displayAllStudents();
+    // ======== Helper Logic Methods (Modularization) ====
+
+    /**
+     * Reusable Linear Search method to find index by ID.
+     */
+    private int findStudentIndex(String studentId) {
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getStudentId().equalsIgnoreCase(studentId)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private void displayStudent(Student student) {
@@ -143,9 +172,6 @@ public class StudentManager {
     }
 
     // =========== Input Helpers =============
-
-    // keeps asking the user for input until they type something
-    // will not accept empty or blank input
     private String readNonEmptyString(String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -155,8 +181,6 @@ public class StudentManager {
         }
     }
 
-    // keeps asking until user enters a valid number
-    // rejects letters, symbols, decimals, and negative numbers
     private int readInt(String prompt) {
         while (true) {
             System.out.print(prompt);
