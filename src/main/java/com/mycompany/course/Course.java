@@ -7,14 +7,26 @@ public class Course {
     // Course attributes
     private String courseName;
     private String courseCode;
+    private String courseType; // core, elective, university
     private int creditHour;
     private String courseSummary;
     private String msTeamsLink;
+
+    // Constructor for relationship module requirement
+    public Course(String courseCode, String courseName, String courseType) {
+        this.courseCode = courseCode;
+        this.courseName = courseName;
+        this.courseType = normalizeCourseType(courseType);
+        this.creditHour = 0;
+        this.courseSummary = "";
+        this.msTeamsLink = "";
+    }
 
     // Constructor – initialises all attributes
     public Course(String courseName, String courseCode, int creditHour, String courseSummary, String msTeamsLink) {
         this.courseName = courseName;
         this.courseCode = courseCode;
+        this.courseType = "core";
         this.creditHour = creditHour;
         this.courseSummary = courseSummary;
         this.msTeamsLink = msTeamsLink;
@@ -35,6 +47,14 @@ public class Course {
 
     public void setCourseCode(String courseCode) {
         this.courseCode = courseCode;
+    }
+
+    public String getCourseType() {
+        return courseType;
+    }
+
+    public void setCourseType(String courseType) {
+        this.courseType = normalizeCourseType(courseType);
     }
 
     public int getCreditHour() {
@@ -59,5 +79,17 @@ public class Course {
 
     public void setMsTeamsLink(String msTeamsLink) {
         this.msTeamsLink = msTeamsLink;
+    }
+
+    private String normalizeCourseType(String value) {
+        if (value == null) {
+            return "core";
+        }
+
+        String normalized = value.trim().toLowerCase();
+        if (normalized.equals("core") || normalized.equals("elective") || normalized.equals("university")) {
+            return normalized;
+        }
+        return "core";
     }
 }

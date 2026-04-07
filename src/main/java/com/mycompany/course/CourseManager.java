@@ -6,8 +6,12 @@ import java.util.Scanner;
 public class CourseManager {
 
     private static final int MAX_COURSES = 100;          // max capacity
+    private static final int MAX_STUDENTS = 100;
     private final Course[] courses = new Course[MAX_COURSES]; // array to store courses (Task 2c)
+    private final Student[] students = new Student[MAX_STUDENTS];
+    private final boolean[][] courseStudentRelationships = new boolean[MAX_COURSES][MAX_STUDENTS];
     private int courseCount = 0;                          // tracks number of stored courses
+    private int studentCount = 0;
     private final Scanner scanner = new Scanner(System.in);
     String courseCode = " ";
 
@@ -86,11 +90,6 @@ public class CourseManager {
 
     // ===================== Display Helpers =====================
 
-    private void pause() {
-        System.out.println("\nPress Enter to return to the menu...");
-        scanner.nextLine();
-    }
-
     // List all stored courses
     void displayAllCourses() {
         System.out.println("\n--- All Courses ---");
@@ -155,9 +154,63 @@ public class CourseManager {
     private void displayCourse(Course course) {
         System.out.println("Course Name    : " + course.getCourseName());
         System.out.println("Course Code    : " + course.getCourseCode());
+        System.out.println("Course Type    : " + course.getCourseType());
         System.out.println("Credit Hour    : " + course.getCreditHour());
         System.out.println("Course Summary : " + course.getCourseSummary());
         System.out.println("MS Teams Link  : " + course.getMsTeamsLink());
+    }
+
+    // Relationship helpers for modularized array operations
+    void addStudentForRelationship(String studentId, String studentName) {
+        if (studentCount >= MAX_STUDENTS) {
+            System.out.println("Cannot add student: storage is full.");
+            return;
+        }
+        if (findStudentIndex(studentId) != -1) {
+            System.out.println("Cannot add student: duplicate student ID.");
+            return;
+        }
+
+        students[studentCount] = new Student(studentId, studentName);
+        studentCount++;
+    }
+
+    void linkStudentToCourse(String courseCode, String studentId) {
+        int courseIndex = findCourseIndex(courseCode);
+        int studentIndex = findStudentIndex(studentId);
+
+        if (courseIndex == -1) {
+            System.out.println("Cannot create relationship: course not found.");
+            return;
+        }
+        if (studentIndex == -1) {
+            System.out.println("Cannot create relationship: student not found.");
+            return;
+        }
+        if (courseStudentRelationships[courseIndex][studentIndex]) {
+            System.out.println("Relationship already exists.");
+            return;
+        }
+
+        courseStudentRelationships[courseIndex][studentIndex] = true;
+    }
+
+    private int findCourseIndex(String code) {
+        for (int i = 0; i < courseCount; i++) {
+            if (courses[i].getCourseCode().equalsIgnoreCase(code)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int findStudentIndex(String id) {
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getStudentId().equalsIgnoreCase(id)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // ===================== Input Helpers =====================
