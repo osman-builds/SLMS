@@ -5,17 +5,29 @@ package com.mycompany.course;
 public class Student {
 
     // student attributes
+    private String studentName;
     private String firstName;
     private String lastName;
     private String studentId;  // cannot be changed after student is created
     private String email;
     private String phoneNumber;
 
+    // constructor for relationship module requirement
+    public Student(String studentId, String studentName) {
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.firstName = studentName;
+        this.lastName = "";
+        this.email = "";
+        this.phoneNumber = "";
+    }
+
     // constructor to set all student details when a new student is created
     public Student(String firstName, String lastName, String studentId, String email, String phoneNumber) {
         this.firstName   = firstName;
         this.lastName    = lastName;
         this.studentId   = studentId;
+        this.studentName = (firstName + " " + lastName).trim();
         this.email       = email;
         this.phoneNumber = phoneNumber;
     }
@@ -39,6 +51,13 @@ public class Student {
         return studentId;
     }
 
+    public String getStudentName() {
+        if (studentName != null && !studentName.trim().isEmpty()) {
+            return studentName;
+        }
+        return (firstName + " " + lastName).trim();
+    }
+
     // returns the email of the student
     public String getEmail() {
         return email;
@@ -56,11 +75,17 @@ public class Student {
     // updates the first name
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+        this.studentName = (this.firstName + " " + this.lastName).trim();
     }
 
     // updates the last name
     public void setLastName(String lastName) {
         this.lastName = lastName;
+        this.studentName = (this.firstName + " " + this.lastName).trim();
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
     }
 
     // updates the email
