@@ -232,6 +232,190 @@ public class CourseManager {
 
 
     }
+    // ===================== RELATIONSHIP MANAGEMENT FUNCTIONS =====================
+
+// 2a. addCourse() - Adds a course to the system and links it to a student.
+// If the course doesn't exist yet, it creates one first.
+// Then it checks the student exists before creating the relationship.
+// Prevents duplicate enrollment between same course and student.
+void addCourse(String courseCode, String courseName, String courseType, String studentId) {
+    int courseIndex = findCourseIndex(courseCode);
+
+    if (courseIndex == -1) {
+        if (courseCount >= MAX_COURSES) {
+            System.out.println("Error: Course storage is full.");
+            return;
+        }
+        courses[courseCount] = new Course(courseCode, courseName, courseType);
+        courseIndex = courseCount;
+        courseCount++;
+        System.out.println("Course " + courseCode + " added.");
+    } else {
+        System.out.println("Course " + courseCode + " already exists.");
+    }
+
+    int studentIndex = findStudentIndex(studentId);
+    if (studentIndex == -1) {
+        System.out.println("Error: Student " + studentId + " not found. Add student first.");
+        return;
+    }
+
+    if (courseStudentRelationships[courseIndex][studentIndex]) {
+        System.out.println("Error: Student " + studentId + " is already in course " + courseCode + ".");
+        return;
+    }
+
+    courseStudentRelationships[courseIndex][studentIndex] = true;
+    System.out.println("Done! Student " + studentId + " enrolled in " + courseCode + ".");
+}
+
+// 2b. addStudent() - Adds a student to the system and links them to a course.
+// If the student doesn't exist yet, it creates one first.
+// Then it checks the course exists before creating the relationship.
+// Prevents duplicate enrollment between same student and course.
+void addStudent(String studentId, String studentName, String courseCode) {
+    int studentIndex = findStudentIndex(studentId);
+
+    if (studentIndex == -1) {
+        if (studentCount >= MAX_STUDENTS) {
+            System.out.println("Error: Student storage is full.");
+            return;
+        }
+        students[studentCount] = new Student(studentId, studentName);
+        studentIndex = studentCount;
+        studentCount++;
+        System.out.println("Student " + studentId + " added.");
+    } else {
+        System.out.println("Student " + studentId + " already exists.");
+    }
+
+    int courseIndex = findCourseIndex(courseCode);
+    if (courseIndex == -1) {
+        System.out.println("Error: Course " + courseCode + " not found. Add course first.");
+        return;
+    }
+
+    if (courseStudentRelationships[courseIndex][studentIndex]) {
+        System.out.println("Error: Student " + studentId + " is already in course " + courseCode + ".");
+        return;
+    }
+
+    courseStudentRelationships[courseIndex][studentIndex] = true;
+    System.out.println("Done! Student " + studentId + " enrolled in " + courseCode + ".");
+}
+
+// 2c. findCourse() - Searches for all courses a student is enrolled in by student ID.
+// Displays full course details for each course found.
+// Shows an error if the student ID doesn't exist in the system.
+// Shows a message if the student has no enrolled courses.
+void findCourse(String studentId) {
+    int studentIndex = findStudentIndex(studentId);
+    if (studentIndex == -1) {
+        System.out.println("Error: Student " + studentId + " not found.");
+        return;
+    }
+
+    System.out.println("\n--- Courses for Student " + studentId + " ---");
+    boolean found = false;
+
+    for (int i = 0; i < courseCount; i++) {
+        if (courseStudentRelationships[i][studentIndex]) {
+            displayCourse(courses[i]);
+            System.out.println("-----------------------------");
+            found = true;
+        }
+    }
+
+    if (!found) {
+        System.out.println("This student is not enrolled in any course.");
+    }
+}
+
+// 2d. listCourses() - Lists all courses a student is enrolled in by student ID.
+// Displays a short summary: course code, name, and type for each course.
+// Shows an error if the student ID doesn't exist in the system.
+// Shows a message if the student has no enrolled courses.
+void listCourses(String studentId) {
+    int studentIndex = findStudentIndex(studentId);
+    if (studentIndex == -1) {
+        System.out.println("Error: Student " + studentId + " not found.");
+        return;
+    }
+
+    System.out.println("\n--- Course List for Student " + studentId + " ---");
+    boolean found = false;
+    int count = 1;
+
+    for (int i = 0; i < courseCount; i++) {
+        if (courseStudentRelationships[i][studentIndex]) {
+            System.out.println(count + ". [" + courses[i].getCourseCode() + "] "
+                    + courses[i].getCourseName() + " (" + courses[i].getCourseType() + ")");
+            count++;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        System.out.println("This student has no enrolled courses.");
+    }
+}
+
+// 2e. findStudent() - Searches for all students enrolled in a course by course code.
+// Displays full student details (ID and name) for each student found.
+// Shows an error if the course code doesn't exist in the system.
+// Shows a message if no students are enrolled in the course.
+void findStudent(String courseCode) {
+    int courseIndex = findCourseIndex(courseCode);
+    if (courseIndex == -1) {
+        System.out.println("Error: Course " + courseCode + " not found.");
+        return;
+    }
+
+    System.out.println("\n--- Students in Course " + courseCode + " ---");
+    boolean found = false;
+
+    for (int j = 0; j < studentCount; j++) {
+        if (courseStudentRelationships[courseIndex][j]) {
+            System.out.println("Student ID   : " + students[j].getStudentId());
+            System.out.println("Student Name : " + students[j].getStudentName());
+            System.out.println("-----------------------------");
+            found = true;
+        }
+    }
+
+    if (!found) {
+        System.out.println("No students are enrolled in this course.");
+    }
+}
+
+// 2f. listStudents() - Lists all students enrolled in a course by course code.
+// Displays a short summary: student ID and name for each student found.
+// Shows an error if the course code doesn't exist in the system.
+// Shows a message if no students are assigned to the course.
+void listStudents(String courseCode) {
+    int courseIndex = findCourseIndex(courseCode);
+    if (courseIndex == -1) {
+        System.out.println("Error: Course " + courseCode + " not found.");
+        return;
+    }
+
+    System.out.println("\n--- Student List for Course " + courseCode + " ---");
+    boolean found = false;
+    int count = 1;
+
+    for (int j = 0; j < studentCount; j++) {
+        if (courseStudentRelationships[courseIndex][j]) {
+            System.out.println(count + ". [" + students[j].getStudentId() + "] "
+                    + students[j].getStudentName());
+            count++;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        System.out.println("This course has no enrolled students.");
+    }
+}
     // Read a non-negative integer from user
     private int readInt(String prompt) {
         while (true) {
