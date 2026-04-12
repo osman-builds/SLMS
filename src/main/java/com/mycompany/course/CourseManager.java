@@ -30,8 +30,13 @@ public class CourseManager {
             switch (choice) {
                 case 1: submitCourseProfile(); break;
                 case 2: displayAllCourses(); break;
-                case 3: editCourse(courseCode); break;
-                case 4: System.out.println("Edit a course: "); break;
+                case 3: // Search Logic
+                String sc = readNonEmptyString("Enter code to search: ");
+                int si = findCourseIndex(sc);
+                if (si != -1) displayCourse(courses[si]);
+                else System.out.println("Course not found.");
+                break;
+                case 4: editCourse(); break;
                 case 5: deleteCourse(); break;
                 case 6: // Enroll Student in Course
                     String cCode = readNonEmptyString("Enter Course Code: ");
