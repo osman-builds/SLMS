@@ -64,7 +64,7 @@ public class CourseManager {
     }
 
     private void printMenu() {
-        System.out.println("\n Course & Relationship Management ");
+        System.out.println("\n Course Manager ");
         System.out.println(" 1. Add a course"); //a
         System.out.println(" 2. Display all courses");
         System.out.println(" 3. Search a course");
