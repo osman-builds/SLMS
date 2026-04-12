@@ -10,7 +10,7 @@ public class Course {
     private String courseType; // core, elective, university
     private int creditHour;
     private String courseSummary;
-    private String msTeamsLink;
+    private String msTeamsLink; 
 
     // Constructor for relationship module requirement
     public Course(String courseCode, String courseName, String courseType) {
