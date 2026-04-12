@@ -2,191 +2,216 @@ package com.mycompany.course;
 
 import java.util.Scanner;
 
+
 public class StudentManager {
 
-    // max number of students we can store, set to 100 to avoid array out of bound
     private static final int MAX_STUDENTS = 100;
 
-    // array to store student objects
-    private final Student[] students = new Student[MAX_STUDENTS];
 
-    // keeps track of how many students are currently stored
-    private int studentCount = 0;
+    private final Student[] students;
+    private final int[]     studentCount;
 
-    // scanner to read user input from console
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner  scanner;
+    private final CacheAPI cache;
 
-    // main method, this is where the program starts
-    public static void main(String[] args) {
-        StudentManager app = new StudentManager();
-        app.run();
+    // ── Constructors ───────────────────────────────────────────────
+
+
+    public StudentManager(CacheAPI sharedCache, Student[] sharedStudents, int[] sharedStudentCount) {
+        this.cache        = sharedCache;
+        this.students     = sharedStudents;
+        this.studentCount = sharedStudentCount;
+        this.scanner      = new Scanner(System.in);
     }
 
-    // keeps the program running until user chooses to exit
+
+    public StudentManager() {
+        this(new CacheAPI(), new Student[MAX_STUDENTS], new int[]{0});
+    }
+
+
+
+    public static void main(String[] args) {
+        new StudentManager().run();
+    }
+
     public void run() {
         boolean running = true;
         while (running) {
             printMenu();
             int choice = readInt("Choose an option: ");
-
             switch (choice) {
-                case 1: submitStudentProfile(); break;
-                case 2: displayAllStudents(); break;
-                case 3: searchStudentModule(); break; // Integrated Task 3
-                case 4: editStudentModule(); break;   // Integrated Task 4
-                case 5: deleteStudent(); break;
-                case 6: running = false; break;
-                default: System.out.println("Invalid choice: Please select from 1 to 6");
+                case 1: submitStudentProfile();   break;
+                case 2: displayAllStudents();     break;
+                case 3: searchStudent();          break;
+                case 4: editStudent();            break;
+                case 5: deleteStudent();          break;
+                case 6: running = false;          break;
+                default: System.out.println("Invalid choice. Select 1–6.");
             }
         }
     }
 
-    // prints the menu options on the screen
     private void printMenu() {
-        System.out.println("\n===== Student Learning Management System =====");
+        System.out.println("\n===== Student Management =====");
         System.out.println("1. Add a student");
         System.out.println("2. Display all students");
         System.out.println("3. Search a student");
         System.out.println("4. Edit a student");
         System.out.println("5. Delete a student");
-        System.out.println("6. Exit");
+        System.out.println("6. Back to main menu");
     }
 
-    // ======== Task 2: Create Function ====
+    // ── CRUD ───────────────────────────────────────────────────────
+
     private void submitStudentProfile() {
-        if (studentCount >= MAX_STUDENTS) {
-            System.out.println("Storage is full.");
+        if (studentCount[0] >= MAX_STUDENTS) {
+            System.out.println("Storage full.");
+            return;
+        }
+        System.out.println("\n--- Add Student ---");
+
+        String firstName = readNonEmptyString("First name: ");
+        String lastName  = readNonEmptyString("Last name: ");
+
+        cache.printSuggestions(CacheAPI.FIELD_STUDENT_ID, "");
+        String studentId = readNonEmptyString("Student ID: ");
+
+        if (findStudentIndex(studentId) != -1) {
+            System.out.println("Error: Student ID '" + studentId + "' already exists.");
             return;
         }
 
-        System.out.println("\n--- Submit Student Profile ---");
-        String firstName   = readNonEmptyString("First name: ");
-        String lastName    = readNonEmptyString("Last name: ");
-        String studentId   = readNonEmptyString("Student ID: ");
-        String email       = readNonEmptyString("Email: ");
-        String phoneNumber = readNonEmptyString("Phone number: ");
+        String email = readNonEmptyString("Email: ");
+        String phone = readNonEmptyString("Phone number: ");
 
-        students[studentCount++] = new Student(firstName, lastName, studentId, email, phoneNumber);
-        System.out.println("Student profile submitted successfully.");
+        Student s = new Student(firstName, lastName, studentId, email, phone);
+        students[studentCount[0]++] = s;   // writes into shared array
+
+        cache.recordInput(CacheAPI.FIELD_STUDENT_ID,   studentId);
+        cache.recordInput(CacheAPI.FIELD_STUDENT_NAME, s.getStudentName());
+        cache.cacheSearchResult(CacheAPI.TYPE_STUDENT, studentId,
+                studentId + " – " + s.getStudentName());
+
+        System.out.println("Student added. Total: " + studentCount[0] + "/" + MAX_STUDENTS);
     }
 
-    // ======== Task 3: Search Function ====
-    private void searchStudentModule() {
-        String searchId = readNonEmptyString("Enter Student ID to search: ");
-        int foundIndex = findStudentIndex(searchId);
-
-        if (foundIndex != -1) {
-            System.out.println("\n--- Student Found ---");
-            displayStudent(students[foundIndex]);
-        } else {
-            // Requirement 3d: Provide clear feedback if the search fails
-            System.out.println("Result: Student not found.");
-        }
-    }
-
-    // ======== Task 4: Edit Function ====
-    private void editStudentModule() {
-        String editId = readNonEmptyString("Enter Student ID to edit: ");
-        
-        //find the index first to ensure the student exists before asking for new data
-        int foundIndex = findStudentIndex(editId);
-
-        if (foundIndex != -1) {
-            Student target = students[foundIndex];
-            System.out.println("\n--- Current Profile ---");
-            displayStudent(target);
-
-            System.out.println("\n[Editing Mode - Student ID cannot be changed]");
-            target.setFirstName(readNonEmptyString("New First Name: "));
-            target.setLastName(readNonEmptyString("New Last Name: "));
-            target.setEmail(readNonEmptyString("New Email: "));
-            target.setPhoneNumber(readNonEmptyString("New Phone Number: "));
-
-            System.out.println("\nUpdate Successful! Validating changes:");
-            displayStudent(target);
-        } else {
-            System.out.println("Error: Student not found. Edit aborted.");
-        }
-    }
-
-    // ======== Task 5 & 6: Delete & Display Functions ====
     private void displayAllStudents() {
-        if (studentCount == 0) {
-            System.out.println("\nNo students to display.");
-            return;
-        }
-        for (int i = 0; i < studentCount; i++) {
-            System.out.println("--- Student " + (i + 1) + " ---");
+        if (studentCount[0] == 0) { System.out.println("\nNo students stored."); return; }
+        System.out.println("\n--- All Students ---");
+        for (int i = 0; i < studentCount[0]; i++) {
+            System.out.println("\nStudent #" + (i + 1));
             displayStudent(students[i]);
-            System.out.println();
         }
+    }
+
+    private void searchStudent() {
+        System.out.println("\n--- Search Student ---");
+
+        cache.printSuggestions(CacheAPI.FIELD_STUDENT_ID, "");
+        String id = readNonEmptyString("Enter Student ID: ");
+        cache.recordInput(CacheAPI.FIELD_STUDENT_ID, id);
+
+        String cached = cache.getCachedResult(CacheAPI.TYPE_STUDENT, id);
+        if (cached != null) System.out.println("[Cache hit] " + cached);
+
+        int idx = findStudentIndex(id);
+        if (idx == -1) { System.out.println("Student not found."); return; }
+
+        displayStudent(students[idx]);
+        cache.cacheSearchResult(CacheAPI.TYPE_STUDENT, id,
+                id + " – " + students[idx].getStudentName());
+    }
+
+    private void editStudent() {
+        System.out.println("\n--- Edit Student ---");
+
+        cache.printSuggestions(CacheAPI.FIELD_STUDENT_ID, "");
+        String id = readNonEmptyString("Enter Student ID to edit: ");
+        cache.recordInput(CacheAPI.FIELD_STUDENT_ID, id);
+
+        int idx = findStudentIndex(id);
+        if (idx == -1) { System.out.println("Student not found."); return; }
+
+        Student s = students[idx];
+        System.out.println("\nCurrent details:");
+        displayStudent(s);
+        System.out.println("\n[Leave blank to keep current value. Student ID cannot be changed.]");
+
+        String fn = readOptionalString("New first name (" + s.getFirstName() + "): ");
+        if (!fn.isEmpty()) s.setFirstName(fn);
+
+        String ln = readOptionalString("New last name (" + s.getLastName() + "): ");
+        if (!ln.isEmpty()) s.setLastName(ln);
+
+        String em = readOptionalString("New email (" + s.getEmail() + "): ");
+        if (!em.isEmpty()) s.setEmail(em);
+
+        String ph = readOptionalString("New phone (" + s.getPhoneNumber() + "): ");
+        if (!ph.isEmpty()) s.setPhoneNumber(ph);
+
+        cache.recordInput(CacheAPI.FIELD_STUDENT_NAME, s.getStudentName());
+        cache.cacheSearchResult(CacheAPI.TYPE_STUDENT, id,
+                id + " – " + s.getStudentName());
+        System.out.println("Student updated.");
     }
 
     private void deleteStudent() {
-        if (studentCount == 0) {
-            System.out.println("No students to delete.");
-            return;
-        }
+        if (studentCount[0] == 0) { System.out.println("No students to delete."); return; }
 
-        String targetId = readNonEmptyString("Enter Student ID to delete: ");
-        int foundIndex = findStudentIndex(targetId);
+        cache.printSuggestions(CacheAPI.FIELD_STUDENT_ID, "");
+        String id = readNonEmptyString("Enter Student ID to delete: ");
+        cache.recordInput(CacheAPI.FIELD_STUDENT_ID, id);
 
-        if (foundIndex == -1) {
-            System.out.println("Student not found.");
-        } else {
-            System.out.println("\n--- Student Found ---");
-            displayStudent(students[foundIndex]);
+        int idx = findStudentIndex(id);
+        if (idx == -1) { System.out.println("Student not found."); return; }
 
-            String confirm = readNonEmptyString("Confirm deletion? (Yes/No): ");
-            if (confirm.equalsIgnoreCase("Yes")) {
-                for (int i = foundIndex; i < studentCount - 1; i++) {
-                    students[i] = students[i + 1];
-                }
-                students[--studentCount] = null;
-                System.out.println("Student deleted successfully.");
-            } else {
-                System.out.println("Deletion cancelled.");
-            }
-        }
+        displayStudent(students[idx]);
+        String confirm = readNonEmptyString("Confirm deletion? (Yes/No): ");
+        if (!confirm.equalsIgnoreCase("Yes")) { System.out.println("Cancelled."); return; }
+
+        for (int i = idx; i < studentCount[0] - 1; i++) students[i] = students[i + 1];
+        students[--studentCount[0]] = null;
+
+        cache.evict(CacheAPI.TYPE_STUDENT, id);
+        System.out.println("Student deleted.");
     }
 
-    // ======== Helper Logic Methods (Modularization) ====
+    // ── Helpers ────────────────────────────────────────────────────
 
-    /**
-     * Reusable Linear Search method to find index by ID.
-     */
-    private int findStudentIndex(String studentId) {
-        for (int i = 0; i < studentCount; i++) {
-            if (students[i].getStudentId().equalsIgnoreCase(studentId)) {
-                return i;
-            }
-        }
+    private int findStudentIndex(String id) {
+        for (int i = 0; i < studentCount[0]; i++)
+            if (students[i].getStudentId().equalsIgnoreCase(id)) return i;
         return -1;
     }
 
-    private void displayStudent(Student student) {
-        System.out.println("Name         : " + student.getFirstName() + " " + student.getLastName());
-        System.out.println("Student ID   : " + student.getStudentId());
-        System.out.println("Email        : " + student.getEmail());
-        System.out.println("Phone Number : " + student.getPhoneNumber());
+    private void displayStudent(Student s) {
+        System.out.println("  Name         : " + s.getFirstName() + " " + s.getLastName());
+        System.out.println("  Student ID   : " + s.getStudentId());
+        System.out.println("  Email        : " + s.getEmail());
+        System.out.println("  Phone        : " + s.getPhoneNumber());
     }
 
-    // =========== Input Helpers =============
     private String readNonEmptyString(String prompt) {
         while (true) {
             System.out.print(prompt);
-            String value = scanner.nextLine().trim();
-            if (!value.isEmpty()) return value;
+            String v = scanner.nextLine().trim();
+            if (!v.isEmpty()) return v;
             System.out.println("Input cannot be empty.");
         }
+    }
+
+    private String readOptionalString(String prompt) {
+        System.out.print(prompt);
+        return scanner.nextLine().trim();
     }
 
     private int readInt(String prompt) {
         while (true) {
             System.out.print(prompt);
             try {
-                int value = Integer.parseInt(scanner.nextLine().trim());
-                if (value >= 0) return value;
+                int v = Integer.parseInt(scanner.nextLine().trim());
+                if (v >= 0) return v;
                 System.out.println("Value cannot be negative.");
             } catch (NumberFormatException e) {
                 System.out.println("Invalid number.");
