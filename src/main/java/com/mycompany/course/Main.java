@@ -48,7 +48,7 @@ public class Main {
 
         System.out.println(" Student Learning Management System ");
         System.out.println(" 1. Student Management ");
-        System.out.println(" 2. Course & Relationship Management ");
+        System.out.println(" 2. Course Management ");
         System.out.println(" 3. View Cache Status ");
         System.out.println(" 4. Exit ");
 
