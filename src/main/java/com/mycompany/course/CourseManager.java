@@ -268,5 +268,25 @@ public class CourseManager {
         }
     }
 
-    static void editCourse(String courseCode) { System.out.println("Edit functionality placeholder"); }
+private void editCourse() {
+    String code = readNonEmptyString("Enter course code to edit: ");
+    int index = findCourseIndex(code);
+
+    if (index == -1) {
+        System.out.println("Course not found."); // Requirement 4c
+        return;
+    }
+
+    Course target = courses[index];
+    System.out.println("\n[Editing Mode - Course Code cannot be changed]");
+    
+    // Update attributes (Requirement 4b)
+    target.setCourseName(readNonEmptyString("New Course Name: "));
+    target.setCreditHour(readInt("New Credit Hour: "));
+    target.setCourseSummary(readNonEmptyString("New Course Summary: "));
+    target.setMsTeamsLink(readNonEmptyString("New MS Teams Link: "));
+
+    System.out.println("\nUpdate Successful!");
+    displayCourse(target); // Requirement 4d
+    }
 }
