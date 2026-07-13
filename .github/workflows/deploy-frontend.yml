@@ -6,7 +6,8 @@ on:
       - main
     paths:
       - 'frontend/**'
-  workflow_dispatch:   # allow manual trigger from GitHub UI
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:   # allow manual trigger from GitHub Actions tab
 
 # Allow the workflow to write to GitHub Pages
 permissions:
