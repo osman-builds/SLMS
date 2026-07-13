@@ -1,0 +1,345 @@
+/* ============================================================
+   SLMS – Moodle-style Custom CSS (Bootstrap 5 override)
+   ============================================================ */
+
+/* ── Google Font ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── CSS Variables ────────────────────────────────────────── */
+:root {
+  --moodle-orange:    #f98012;
+  --moodle-orange-dk: #e0700c;
+  --moodle-dark:      #3a3a3a;
+  --moodle-sidebar:   #2e2e2e;
+  --moodle-sidebar-hover: #404040;
+  --sidebar-width:    260px;
+  --topbar-height:    56px;
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f4f4f4;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* ── Colour Utilities ─────────────────────────────────────── */
+.text-moodle           { color: var(--moodle-orange) !important; }
+.bg-moodle             { background-color: var(--moodle-orange) !important; }
+.bg-moodle-subtle      { background-color: #fff3e0; }
+.border-moodle         { border-color: var(--moodle-orange) !important; }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn-moodle {
+  background-color: var(--moodle-orange);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  transition: background-color .2s, transform .1s;
+}
+.btn-moodle:hover,
+.btn-moodle:focus {
+  background-color: var(--moodle-orange-dk);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.btn-outline-moodle {
+  color: var(--moodle-orange);
+  border: 1.5px solid var(--moodle-orange);
+  font-weight: 500;
+  transition: all .2s;
+}
+.btn-outline-moodle:hover {
+  background-color: var(--moodle-orange);
+  color: #fff;
+}
+
+/* ── Top Navbar ───────────────────────────────────────────── */
+.top-navbar {
+  height: var(--topbar-height);
+  background-color: var(--moodle-dark);
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+.top-navbar .brand {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  flex-shrink: 0;
+}
+.top-navbar .brand .logo-block {
+  width: 32px;
+  height: 32px;
+  background: var(--moodle-orange);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 900;
+}
+
+.top-navbar .nav-spacer { flex: 1; }
+
+.top-navbar .top-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.top-navbar .top-nav-actions .icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s;
+  font-size: 1rem;
+}
+.top-navbar .top-nav-actions .icon-btn:hover {
+  background: rgba(255,255,255,.2);
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: #fff;
+  cursor: pointer;
+  padding: .25rem .5rem;
+  border-radius: 8px;
+  transition: background .2s;
+  text-decoration: none;
+}
+.user-menu:hover { background: rgba(255,255,255,.1); }
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--moodle-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.user-menu .user-name {
+  font-size: .85rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ── Page Layout ──────────────────────────────────────────── */
+.app-wrapper {
+  display: flex;
+  padding-top: var(--topbar-height);
+  min-height: 100vh;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-width);
+  background: var(--moodle-sidebar);
+  position: fixed;
+  top: var(--topbar-height);
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  z-index: 1020;
+  display: flex;
+  flex-direction: column;
+  transition: transform .3s;
+}
+
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 2px; }
+
+.sidebar-section-label {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  padding: 1.25rem 1.25rem .4rem;
+}
+
+.sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .6rem 1.25rem;
+  color: rgba(255,255,255,.75);
+  font-size: .88rem;
+  font-weight: 500;
+  border-radius: 0;
+  transition: all .2s;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+}
+.sidebar-nav .nav-link:hover {
+  background: var(--moodle-sidebar-hover);
+  color: #fff;
+}
+.sidebar-nav .nav-link.active {
+  background: rgba(249,128,18,.15);
+  color: var(--moodle-orange);
+  border-left-color: var(--moodle-orange);
+  font-weight: 600;
+}
+.sidebar-nav .nav-link i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(255,255,255,.07);
+  margin-top: auto;
+  color: rgba(255,255,255,.4);
+  font-size: .75rem;
+  text-align: center;
+}
+
+/* ── Main Content ─────────────────────────────────────────── */
+.main-area {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#mainContent {
+  flex: 1;
+  padding: 1.75rem;
+}
+
+/* ── Breadcrumb Bar ───────────────────────────────────────── */
+.breadcrumb-bar {
+  background: transparent;
+}
+.breadcrumb { font-size: .82rem; }
+.breadcrumb-item a { color: var(--moodle-orange); text-decoration: none; }
+.breadcrumb-item a:hover { text-decoration: underline; }
+
+/* ── Cards ────────────────────────────────────────────────── */
+.stat-card {
+  border-radius: 10px;
+  transition: transform .2s, box-shadow .2s;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.1) !important;
+}
+.stat-number { line-height: 1; color: var(--moodle-dark); }
+.stat-icon { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+
+.course-card {
+  border-radius: 8px;
+  border: 1px solid #e8e8e8 !important;
+  transition: transform .2s, box-shadow .2s;
+}
+.course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
+}
+
+/* ── Avatars ──────────────────────────────────────────────── */
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  flex-shrink: 0;
+}
+
+/* ── Tables ───────────────────────────────────────────────── */
+.table { font-size: .875rem; }
+.table > thead > tr > th {
+  font-weight: 600;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #666;
+  border-bottom: 2px solid #dee2e6;
+}
+.table > tbody > tr { transition: background .15s; }
+.table > tbody > tr:hover { background: rgba(249,128,18,.04); }
+
+/* ── Page Header ──────────────────────────────────────────── */
+.page-header h2 { font-size: 1.5rem; }
+
+/* ── Toast Container ──────────────────────────────────────── */
+#toastContainer {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  min-width: 280px;
+  max-width: 360px;
+}
+
+/* ── Misc ─────────────────────────────────────────────────── */
+.x-small { font-size: .75rem; }
+code { font-size: .82em; }
+
+.footer-bar {
+  background: #fff;
+  border-top: 1px solid #e8e8e8;
+  padding: .65rem 1.75rem;
+  font-size: .78rem;
+  color: #888;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  #sidebar {
+    width: 100%;
+    max-width: 280px;
+    transform: translateX(-100%);
+    transition: transform .3s;
+  }
+  #sidebar:not(.d-none) { transform: translateX(0); }
+  .main-area { margin-left: 0; }
+}
+
+/* ── Scrollbar (Chrome) ───────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #aaa; }
