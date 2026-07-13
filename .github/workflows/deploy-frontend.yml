@@ -7,15 +7,15 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/deploy-frontend.yml'
-  workflow_dispatch:   # allow manual trigger from GitHub UI
+  workflow_dispatch:   # allow manual trigger from the GitHub Actions tab
 
-# Allow the workflow to write to GitHub Pages
+# Minimum permissions required for Pages deployment
 permissions:
-  contents: write   # needed for configure-pages enablement
+  contents: read
   pages: write
   id-token: write
 
-# Only one deployment at a time; cancel in-progress runs
+# Only one Pages deployment runs at a time
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -35,15 +35,10 @@ jobs:
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
-        with:
-          # Automatically enables GitHub Pages if it is not already enabled
-          enablement: true
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload frontend as Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Deploy only the frontend/ directory
           path: './frontend'
 
       - name: Deploy to GitHub Pages
