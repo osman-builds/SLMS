@@ -8,7 +8,7 @@
 
 > A Student Learning Management System featuring a **Moodle-inspired web frontend** and a **console-based Java backend**. Built as an academic software engineering exercise to demonstrate object-oriented design, state sharing, custom data structures, and modern CI/CD deployment.
 
-🌐 **Live Demo:** [https://osman-builds.github.io/SLMS/](https://osman-builds.github.io/SLMS/frontend/)
+🌐 **Live Demo:** [https://osman-builds.github.io/SLMS/](https://osman-builds.github.io/SLMS/)
 
 ---
 
